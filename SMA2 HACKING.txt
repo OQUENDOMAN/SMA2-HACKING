@@ -1,0 +1,460 @@
+SMA2 hacking notes 1.1 - By Oquendo
+=======================================
+
+A lot of things are stored in the same way as in SMW, albeit with a few tweaks. As such, I won't go into detail if something works the same way as in SMW.
+
+
+==============
+    LEVELS    
+==============
+
+
+== Main pointer tables ==
+
+
+The pointers are stored as 4-byte GBA pointers (which, simply put, is the normal PC address with $08 added as the highest byte) in little-endian byte order.
+
+Layer 1 data: $0F22CC
+Layer 2 data: $0F2AF0
+Sprites data: $0F3314
+
+Note that SMA2 has 521 levels (000-208), compared to SMW's 512 (000-1FF). The nine additional levels are the special Donut Plains 2 sublevels not found in SMW's main pointer table.
+
+
+== Primary level header ==
+
+
+The level header is the first 7 bytes of the layer 1/2LV data. It has been changed slightly from SMW.
+
+-----------+-----------+-----------+-----------+-----------+-----------+-----------
+ BBBL LLLL | SSSM MMMM | mmmm ssss | ttPP PFFF | IIOC TTTT | bbbb cccc | ???? ????
+-----------+-----------+-----------+-----------+-----------+-----------+-----------
+
+BBB   : BG Palette
+LLLLL : Level length
+SSS   : Scroll type [1]
+MMMMM : Level mode
+mmmm  : Music [2]
+ssss  : Spriteset
+tt    : Time
+PPP   : Sprite Palette
+FFF   : FG Palette
+II    : Item memory
+O     : Screen snap [3]
+C     : Camera height [4]
+TTTT  : Tileset
+bbbb  : BG Color [5]
+cccc  : Camera sensitivity [6]
+
+The purpose of the final byte is unknown. None of the standard levels have a value other than 00.
+
+1) The scroll type has been expanded from two to three bits. The values are as follows:
+000  : No vertical scroll
+001  : Vertical scroll if running+jumping, climbing or standing high
+010  : Vertical scroll at will (medium)
+011  : No horizontal or vertical scroll
+100  : Vertical scroll at will (within SNES screen)
+101  : Vertical scroll at will (high)
+110  : Vertical scroll at will (entire level)
+111  : Vertical scroll at will (low)
+
+2) The music has been expanded from three to four bits. The values are as follows:
+0000  : Here we go!
+0001  : Cave Drums
+0010  : Piano
+0011  : Castle
+0100  : Ghost House
+0101  : Water Level
+0110  : Boss Battle
+0111  : Switch Palace
+1000  : Switch Palace
+1001  : Bowser Battle
+The rest is either nothing or crashes.
+
+3) The screen snap bit moves the camera to the center of the first screen in order to make rooms taking up a single screen look better on the limited screen.
+
+4) If the camera height bit is cleared, the lowest point the camera will scroll to is the same as in SMW (hiding the lowest row of blocks). If set, the lowest point is a block higher than normal (hiding the two lowest rows of blocks). This is done to allow some levels to use the limited GBA screen more efficiently.
+
+5) The BG color has been increased from three to four bits. The first 8 colors are the same as in SMW (albeit brighter like the rest of the game's palette).
+
+6) This setting changes how sensitive the camera is, i.e. how high on the screen Mario has to be in order to start scrolling.
+
+
+== Secondary level header ==
+
+
+Like in SMW, the secondary header bytes are not stored sequentially. First, there's a table with all levels' first byte, then one with all levels' second byte, etc. This header has also been changed slightly.
+
+The tables are stored in these locations:
+Byte 1 table: $0F3D44
+Byte 2 table: $0F3F44
+Byte 3 table: $0F4144
+Byte 4 table: $0F4344
+Byte 5 table: $0F4544
+
+-----------+-----------+-----------+-----------+-----------
+ SSSS YYYY | 33TT TXXX | MMMM BBBB | ???? FFFF | IUVP PPPP
+-----------+-----------+-----------+-----------+-----------
+
+SSSS  : Layer 2 scroll settings
+YYYY  : Level entrance Y position
+33    : Layer 3 image
+TTT   : Entrance type
+XXX   : Level entrance X position
+MMMM  : Midway entrance screen
+BBBB  : Initial BG Y [1]
+FFFF  : Initial FG Y [1]
+I     : Disable no-Yoshi intro flag
+U     : Unknown vertical position flag
+V     : Vertical positioning flag
+PPPPP : Level entrance screen
+
+1) The initial BG/FG Y settings have been expanded from two to four bits.
+
+
+== Layer 1/2LV data ==
+
+
+Some blocks' sizes are for some reason stored in a different way from SMW. The known instances of this:
+
+* Wooden log - The nibbles of the size bits have changed places. (Thus, if it was 1A in SMW, it would be A1 in SMA2.)
+* Arch ledge - Okay, Nintendo screwed this one up big time. The table below shows how many arches are placed for certain values. (V = Value, A = Arches in SMA2, W = Arches in SMW)
+
+ V   A   W
+------------
+00   2   256
+01   1   1
+02   3   2
+03   4   3
+04   5   4
+05   6   5
+...etc...
+
+
+== Sprite level data ==
+
+
+Sprite data (including the header) seems to be stored in the same way, with a few exceptions:
+
+* Sprite $C9 and above in SMW have been moved three steps forward to $CC and above.
+* In that opening, three new sprites have been placed: $C9 - Coin collection block (from DP1), $CA - Yoshi Coin, $CB - Yoshi Coin (behind fence).
+* One or more 4-byte sprites have been added. All normal SMW sprites (including the three SMA2 ones mentioned above) still seem to be 3 bytes long, though.
+* SMA2 requires all sprites to be stored sorted according to their global X coordinate. (Y coordinate, I assume, for vertical levels)
+
+
+== Secondary level entrances ==
+
+
+Like the secondary headers, this data is also split up into five separate tables, starting at $F4744. Five byte tables, each with 512 entries.
+
+-----------+-----------+-----------+-----------+-----------
+ DDDD DDDD | FFFF YYYY | ???? BBBB | XXXS SSSS | I??? ?AAA
+-----------+-----------+-----------+-----------+-----------
+
+DDDDDDDD  : Destination level
+FFFF      : Initial FG Y [1]
+YYYY      : Mario Y position
+BBBB      : Initial BG Y [1]
+SSSSS     : Destination screen
+XXX       : Mario X position
+I         : Slippery level
+AAA       : Mario Action
+
+1) The initial BG/FG Y settings have been expanded from two to four bits.
+
+SMA2 midway entrances
+
+Level 7 (#2 Morton's Castle) - Level E7 main entrance
+Level A (Donut Secret 1) - Level A at X=61, Y=17
+Level B (Vanilla Fortress) - Level E0 at X=20, Y=8
+Level E (#4 Ludwig's Castle) - Level DB main entrance
+Level 1D (Chocolate Island 4) - Level 1D at X=88, Y=A
+Level 1F (Forest Fortress) - Level D6 main entrance
+Level 20 (#5 Roy's Castle) - Level 20 at X=98, Y=12
+Level 21 (Choco-Ghost House) - Level 21 at X=C2, Y=16
+Level 107 (Vanilla Ghost House) - Standard midway entrance on screen 8
+Level 111 (Valley Fortress) - Level 111 at X=89, Y=15
+Level 11D (Forest Ghost House) - Level 11D at X=A2, Y=16
+Level 120 (Forest of Illusion 2) - Level 120 at X=61, Y=8
+
+
+Notes:
+- Some coordinates here may be incorrect due to changes in object positioning.
+- All midway entrances are "do nothing" entrances, even in water levels.
+- Level A, 1D, 20, and 120's midway entrances match the X-coordinate of the main entrance, but not the Y-coordinate.
+- Level 21's midway entrance matches the Y-coordinate of the main entrance, but not the X-coordinate.
+- There are still no midpoints in the Star World, the Special World, or vertical levels.
+
+OK, new discovery--
+
+As I somewhat suspected, SMA2's midway entrances use a different setting for their X/Y position. (However, they still use the screen number setting from the original header.)
+
+I was testing my ported level 105, and died after the midpoint. I restarted from level 105's original midway entrance, not my new midway entrance (which was directly above the old one).
+
+I then tried changing the midway screen from 9 to A, and Mario started on screen A, but was still at the original coordinates.
+
+(I wonder where the midway entrances are located? I would guess that they're stored in a similar way as secondary entrances...)
+
+---
+
+Edit:
+
+After scanning through the secondary header 3rd bytes, it seems that the screen numbers are correct for all of SMA2's new midway entrances.
+
+For example, level E7's main entrance (which is the same as level 7's midway entrance) is on screen 7, and level 7's midway entrance is set to screen 7.
+
+---
+
+Edit 2:
+
+After some more testing, it seems that entrance types are still carried over from the main entrance to the midway entrance.
+
+However (as I mentioned earlier), Mario starts out standing still in water level midway entrances (entrance type 7), instead of exiting from a pipe.
+
+---
+
+Edit 3:
+
+Something different now.
+
+I was experimenting with changing the default timer values ([00 02 03 04] at xD96C4 if anyone's interested).
+
+When I changed the 00 to 03, the castle intro scenes had 300 time, as expected. The timer counts down during the intro scene, but resets when the level actually begins.
+
+However, after the change, the castle intro scenes for Front Door and Back Door had 800 and 600 time (the same as the actual levels). (The timer still reset when the level actually began, though.)
+
+Also, the bonus game timer remained at 0.
+
+(Also, I discovered that although you can exit Front Door from the pause menu after you win the game, that's not true for Back Door. It may just be a programming oversight, but it gets me wondering if Front Door's event activates when you win the game (causing the castles to be rebuilt).)
+
+OK, that's definitely useful.
+
+I wonder where the two extra music settings are stored (and why they exist in the first place)... The standard music values (02 06 01 08 07 03 05 12) still exist at xD96C8.
+
+Also, the standard timer values (00 02 03 04) still exist at xD96C4 (even though timer 0 is unused in SMA2 as far as I know).
+Front Door and Back Door must have a special setting then...
+
+(Edit: Timer 0 is used for the castle/etc. intro scenes. I doubt it would be a problem though to change it to a different value.)
+
+(By the way, I think there's a small mistake in the level number section-- it's Chocolate Island 2, not Donut Plains 2, right?)
+
+
+One question-- In vertical levels, is the highest Y-position bit instead used as the highest X-position bit?
+Edit 2:
+
+I wonder how the GBA level names are stored... I did a search for 120402110413 ("SECRET") as well as some other portions of level titles, and although they are in SNES SMW, they were not found in SMA2...
+
+(I suspect the level names were re-coded to allow for the exit checklist (accessed by pressing Select), which has different spacing. (Among other things, "Yellow Switch Palace" is evenly spaced on that screen.)
+
+---
+
+Edit 3:
+
+If I find interesting things regarding SMA2 hacking, where would I post them?
+
+For example, I've found that the boxes on the results screen correspond to the event numbers, not the particular levels. (When I obtained a secret exit in Yoshi's Island 1, the box for Yellow Switch Palace became filled.)
+
+Also, message blocks no longer destroy Layer 3 water-- it only vanishes temporarily.
+INTERESTING THINGS
+- I've found that the boxes on the results screen correspond to the event numbers, not the particular levels. (When I obtained a secret exit in Yoshi's Island 1, the box for Yellow Switch Palace became filled.)
+
+- Message blocks no longer destroy Layer 3 water (though the water still vanishes temporarily).
+
+- Level names are not stored in the same way as the original SMW. (No idea how they are stored, though.)
+
+- The number 0 was removed from the available characters in message blocks-- the message about the 30-coin star block now uses a capital O.
+
+ In Donut Secret 2, around screen 9, the screen will scroll a bit strangely if you're on the upper level. (Maybe this is a new sprite?)
+
+- Front Door and Back Door have timers of 800 and 600, respectively, but these appear not to exist in the header.
+
+- Also, there's an undocumented new sprite-- the rotating platforms (1 or 3) with a Dragon Coin that appear in Donut Plains 3, Chocolate Island 3, and Star World 4. (These platforms may be a variant of the existing rotating platforms though.)
+
+Information that would be useful (in approximate order of priority):
+
+√ How object/sprite data is stored (a list of all objects/extended objects/sprites would be nice as well, though I could get that from Lunar Magic)
+
+√ How screen exits are stored
+
+√ How level headers are stored
+
+- How messages are stored (which hex values correspond to each character, what determines which level they're used in, etc.-- this is for message blocks and castle destruction scenes)
+Edit: I located some GBA messages and worked out the character values for myself. (The castle destruction scene messages are in a different format though-- I couldn't find them.)
+
+- How level names are stored (I've heard SMW has a convoluted way of generating level names, but I could still rename a level something like "Yoshi's Secret Area", "Forest of Illusion 5", or "Chocolate Plains 1", right?)
+Edit: I found this for SMW (it was in the ROM map), but SMA2's level names are apparently stored in a different format. (Hopefully an easier-to-use format.)
+
+- How Layer 1 overworld data is stored (this would be for modifying map icons, though it would also be nice to change event numbers if I feel like giving a 1-exit level a secret exit instead of a normal exit)
+
+(I would also need pointer locations, but I could probably find them on my own by searching for hex values-- GBA pointers are pretty simple as far as I know.)
+
+(By the way, remember that I'm asking about how they're stored without any of Lunar Magic's modifications.)
+
+I've found the SMA2 level names
+Or at least, the graphics of them.
+
+It appears they begin at x13FE90. (Note that you need to manually enter the offset in YY-CHR-- the graphics will be staggered strangely if you use the scroll bar.)
+
+And it appears that the SMA2 level names are just as convoluted as the SMW level names. (It appears to me that they're stored as varying-length strings of 8x8 tiles.)
+https://media.discordapp.net/attachments/865317223073054770/869677928089284629/yychr-sma2-13FE90.png
+https://media.discordapp.net/attachments/865317223073054770/869677985983242280/yychr-sma2-141E90.png
+The first image is 13FE90; the second is 141E90
+I would guess everything from x10A4F0 or so to x30066F is graphics. (Some of it shows up in YY-CHR as graphics (though you may need to use strange offsets like 118454 to make them line up); and other parts show up as what appears to be compressed graphics-- that is, there are gradients and such in the pixels, but no obvious pattern.)
+LEVEL DIFERENCES
+Level header:
+SMW:    33 40 08 80 27
+SMA2:    33 40 08 80 07 22 00
+
+Aside from the two new bytes that SMA2 adds to the level header (I have yet to determine how exactly these bytes work), the only change is disabling vertical scroll, supporting my theory that this property is now decided by the extra bytes.
+
+The pointer to Level 105 is there :
+PC Offset : 0xf26e0
+Pointers starts at 0xf22cc and ends at 0xf3b37.
+6252 bytes.
+There are Layer 1, Layer 2 and Sprite Data like SMW, so i do this :
+6252 / 3 = 2084.
+A Pointer does 4 bytes, so :
+2084 / 4 = 521.
+
+521 Levels.
+There are plenty of differences between the versions. (Probably the most noticeable is that the GBA version uses the power-up system found in most Mario sidescrollers (get hit as fiery or caped and become Super, not small).)
+
+Though for hacking purposes, one of the more relevant differences is that it seems midway entrances can be anywhere...
+
+(Try dying after the midpoint in Morton's Castle or Ludwig's Castle, among others. Actually, try dying after any midpoint that wasn't in the original-- I do not believe most of the new midway entrances line up with the main entrances.)
+
+Also, it seems the timer bonus glitch was fixed, at least considering the x100 and x200 bonuses on bosses and the Special World, and the x500 bonus on Bowser. (Also, Bowser's Castle has a starting timer of 800 for the Front Door and 600 for the Back Door.)
+
+Then there are a few new ways that Dragon Coins are placed. Besides the Dragon Coins in front of and behind fences, there are Dragon Coins on the moving platforms in Donut Plains 3 / Chocolate Island 3 / Star World 4. And there are moving Dragon Coins in some castles (though that may just be Layer 2).
+
+Also, Yoshi can stand on anything that Mario can stand on. And Yoshi runs slower when Mario is knocked off. And Yoshi will move if he's standing still and Mario tries to walk through him. And Yoshi will not turn blue with Yoshi wings, but you can get any color Yoshi (that you've rescued) from Yoshi blocks.
+
+I found there being some connections between Lunar Magic itself and SMA2.
+A Few times back I thought I could find astounding discoveries if I opened the EXE on a HEX Editor, being a total nut, I had no idea that all I would find was just about nothing.
+
+However, there were some interesting ASCII strings around 8C4E0.
+-This sprite command is valid for SMA2 only, and should not be used in other games.
+-This sprite command is valid for SMA2 only, and should not be used in other games.
+-This sprite command is valid for SMA2 only, and should not be used in other games.
+-This sprite command is valid for SMA2 only, and should not be used in other games.
+-This sprite command is valid for SMA2 only, and should not be used in other games.
+-A yellow octagonal block with a picture of a coin on it. When hit, it gives you a display of how many coins are in the area that haven't been collected yet. If you collect them all, you get an extra 3-UP. If the sprite is used in a level that doesn't support it, the block simply bounces away and vanishes when hit. This is a new sprite that is only available in SMA2.
+-A Yoshi coin implemented as a Sprite. This is a new sprite that is only available in SMA2.
+
+By opening the Lunar Magic executable in a hex editor, one can find interesting things, including *.gba files grouped in with the dialogue for Open ROM, and information on several sprites from SMA2. By modifying the executable, it is, in fact, possible to have GBA files available for selection there. The results are very interestings
+
+NEW EDITION:
+SMA2 SPRITES I'DS
+Quantity Digits to Accompany Character Modifier Code
+00 - Mario
+01 - Luigi
+Quantity Digits to Accompany Power Up Modifier Codes
+00 - Normal Power
+01 - Mushroom Power
+02 - Fire Power
+03 - Cape Power
+Quantity Digits to Accompany Have In Reserve Modifier Code
+01 - Mushroom
+02 - Flower
+03 - Star
+04 - Feather
+05 - 1-up
+06 - Vine
+07 - Really Weird Thing
+0A - P-balloon
+0B - Flying Coin
+0C - Flying Mushroom
+0D - Flying Key (It Hurts You)
+0E - Changing Powerup
+10 - Left Flying Coin Block
+11 - Right Flying Coin Block
+13 - Wiggler
+14 - Cloud Box
+16 - Giant Crusher
+1C - Strange Platform
+1D - Green Blob From Ghost House
+1E - Chargin Chuck
+26 - Volcano Plant
+27 - Sumo Bros
+29 - Flying Hammer Bros
+2A - Goomba Inside Bubble
+2B - Spike Ball On Chain
+2C - Banzai Bill
+2D - Strange Lightnigh Storm
+2F - Mecha Koopa
+30 - Rotating Platform
+38 - Rex
+3B - Fishing Boo
+3C - Block Buddy
+3E - Right Moving Block
+44 - Slanted Moving Playform
+46 - Info Box
+4A - Koopa Without Shell
+4B - Swooper
+4D - Falling Platform
+4E - Right Moving Flying Platform
+4F - Green Fish
+50 - Porcupuffer
+55 - Red Question Block
+56 - Coin Cointer
+57 - Yoshi Coin
+5B - Instant Death
+A3 - Fish
+95 - Flying Green Koopa
+91 - Green Koopa
+92 - Red Koopa
+93 - Blue Koopa
+96 - Hopping Green Koopa
+97 - Flying Red Koopa
+99 - Flying Yellow Koopa
+9B - Keyhole
+9C - Goomba
+9D - Hopping Goomba
+A0 - Spike Shell
+AC - Magic Koopa
+AD - Magic Blast/magic Koopa
+AE - Falling Coin
+B3 - Thwomp
+B4 - Little Thwomp
+B5 - Big Boo
+BC - Trampoline
+BD - ThrowingBone Guy
+BF - Normal Bone Guy
+C2 - Green Yoshi
+C5 - Ghost
+CA - Sleeping Fish
+CC - Parachuting Goomba
+CD - Parachuting Bomb
+DC - Pirana Plant
+E3 - Moving Platform
+E6 - Floding Platform
+F7 - Coin Cloud
+FB - Big Dino
+FC - Small Dino
+Quantity Digits to Accompany Have Yoshi Modifier Code
+00 - No Yoshi
+01 - Yellow Yoshi With Blue Yoshi Abilities
+02 - Grey Yoshi With Yellow Yoshi Abilities
+04 - Yellow Yoshi
+06 - Blue Yoshi
+08 - Red Yoshi
+0A - Green Yoshi
+0C - Dark Grey Yoshi
+0E - Aqua Yoshi
+MORE YOSHIS COLORS
+White Body, Orange boots.
+316b042e0121
+Yellow Body,Red boots.
+75e2343cc521
+Blue body,red boots.
+31e243c0521
+Red body, red boots.
+7d6a1c26c969
+These will automaticly work, but it does not work
+On the title screen.
+Green Yoshi (Normal Color)
+396b0c260000
+Grey Yoshi, Red boots
+7de23c34d69
+*Multi Yoshi**
+39e32c340d6
