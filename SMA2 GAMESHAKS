@@ -1,0 +1,133 @@
+
+Made on VBA 0.9.a
+These codes are for XPloderAdvance only !
+1	MasterCode	9A1F 9DC2 4DB3
+AE3E 9852 0C49
+41CA FC5F 9E7D
+SUPER MARIO WORLD
+2	Infinite lives	D469 778F 77FF
+3	Infinite time	2259 2F1F 7E7D
+4	Invincible	6E83 DD18 ED06
+5	Lose yoshi at end / start of level	FE03 CD1C 7FA2
+6	Yellow yoshi with blue yoshi abilities	FE89 CD1C FFAE
+7	Grey yoshi with yellow yoshi abilities	BA03 9D1C 6DA2
+8	Yellow yoshi	FF07 C914 7EA0
+9	Blue yoshi	BB07 9914 6CA0
+10	Red yoshi	FE12 CC5C 1FA2
+11	Green yoshi	BA12 9C5C 0DA2
+12	Dark grey yoshi	FF16 C854 1EA0
+13	Aqua yoshi	BB16 9854 0CA0
+14	Map time 00:00:00	32E7 2300 ECC1
+F6C7 6B17 FEF1
+15	Eat one enemy for yoshi to grow	91E3 AC5B AD1B
+16	Have 5 dragon coins	45E3 670F EC75
+17	Every pink berry makes yoshi lay a cloud	4469 ED1F 7E7D
+18	Every red berry makes yoshi lay a eeg	016D A917 6D7B
+19	Max coins (Each coin gets you a free guy)	98A3 958F E5F7
+20	99 bonus stars
+(Press Select)	2F60 844B 0D12
+DCA3 D58F F7F7
+21	Floating
+(Hold L)	2E64 8043 0E10
+00E9 ADFC A0A8
+Always :
+22	Small	0826 8040 0C00
+23	Big	08AC 8040 8C0C
+24	Have star power	6F19 DDBC 602C
+25	Have fire power	4C26 D040 1E00
+26	Have cape power	4CAC D040 9E0C
+Always have :
+(In reserve)
+27	Mushroom	0826 8040 0C04
+28	Flower	4CAC D040 9E08
+29	Star	4C26 D040 1E04
+30	Feather	09A8 8448 8D0A
+31	1-up	0922 8448 0D06
+32	Vine	4DA8 D448 9F0A
+33	Really weird thing	4D22 D448 1F06
+34	P-balloon	4CBD D100 FE08
+35	Flying coin	4C37 D100 7E04
+36	Flying mushroom	09B9 8508 ED0A
+37	Flying key (It hurts you)	0933 8508 6D06
+38	Changing powerup	4DB9 D508 FF0A
+39	Left flying coin block	98AC 8044 88A8
+40	Right flying coin block	9826 8044 08A4
+41	Wiggler	DC26 D044 1AA4
+42	Cloud box	99A8 844C 89AA
+43	Giant crusher	DDA8 D44C 9BAA
+44	Strange platform	99B9 850C E9AA
+45	Green blob from ghost house	9933 850C 69A6
+46	Chargin chuck	DDB9 D50C FBAA
+47	Volcano plant	6F88 DCD8 9F0A
+48	Sumo bros	6F02 DCD8 1F06
+49	Flying hammer bros	2A17 8990 6C04
+50	Goomba inside bubble	6E9D D990 FE08
+51	Spike ball on chain	6E17 D990 7E04
+52	Banzai bill	2B99 8D98 ED0A
+53	Strange lightning storm	2B13 8D98 6D06
+54	Mecha koopa	6F13 DD98 7F06
+55	Rotating platform	BA8C 88D4 88A8
+56	Rex	BA9D 8994 E8A8
+57	Fishing boo	FE17 D994 7AA4
+58	Block buddy	BB99 8D9C E9AA
+59	Right moving block	FF99 DD9C FBAA
+60	Slanted moving playform	01E8 2648 850A
+61	Info box	45E8 7648 970A
+62	Koopa without shell	44FD 7300 F608
+63	Swooper	4477 7300 7604
+64	Falling platform	0173 2708 6506
+65	Right moving flying platform	45F9 7708 F70A
+66	Green fish	4573 7708 7706
+67	Porcupuffer	90EC 2244 80A8
+68	Red question block	9162 264C 01A6
+69	Coin cointer	D5E8 764C 93AA
+70	yoshi coin	D562 764C 13A6
+71	Instant death	D477 7304 72A4
+72	Fish	6E06 D8F3 1E55
+73	Flying green koopa	9922 846F 09F7
+74	Green koopa	9826 8067 08F5
+75	Red koopa	DCAC D067 9AF9
+76	Blue koopa	DC26 D067 1AF5
+77	Hopping green koopa	DDA8 D46F 9BFB
+78	Flying red koopa	DD22 D46F 1BF7
+79	Flying yellow koopa	9837 8127 68F5
+80	Keyhole	DC37 D127 7AF5
+81	Goomba	99B9 852F E9FB
+82	Hopping goomba	9933 852F 69F7
+83	Spike shell	2A8C 88F3 8C59
+84	Magic koopa	2B99 8DBB ED5B
+85	Magic blast / magic koopa	2B13 8DBB 6D57
+86	Falling coin	6F99 DDBB FF5B
+87	Thwomp	FE06 D8F7 1AF5
+88	Little thwomp	BB88 8CFF 89FB
+89	Big boo	BB02 8CFF 09F7
+90	Trampoline	BB99 8DBF E9FB
+91	Throwing bone guy	BB13 8DBF 69F7
+92	Normal bone guy	FF13 DDBF 7BF7
+93	Green yoshi	44EC 7263 9659
+94	Ghost	0162 266B 0557
+95	Sleeping fish	44FD 7323 F659
+96	Parachuting goomba	01F9 272B E55B
+97	Parachuting bomb	0173 272B 6557
+98	Pirana plant	91F9 272F E1FB
+99	Moving platform	6646 7AF3 1655
+100	Floding platform	67C8 7EFB 975B
+101	Coin cloud	F742 7EFF 13F7
+102	Big dino	F657 7BB7 72F5
+103	Small dino	B3D9 2FBF E1FB
+MARIO BROS.
+104	Invincible
+(Press & hold L)	2E64 8043 0E10
+00E2 2E58 9F06
+105	Start with high score	2AC6 0A50 8C00
+11D3 AFA8 61C3
+6EC6 4A50 9E00
+2A86 9850 8C00
+Infinite :
+106	Lives	4CA7 D180 F706
+107	Credits	66C7 7B10 FF02
+Start on :
+108	Phase 64	00A7 A100 ED02
+F758 7EDC 1AAC
+109	Phase 99	00A7 A100 ED02
+6E87 D990 F702
